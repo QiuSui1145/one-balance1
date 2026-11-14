@@ -263,6 +263,9 @@ async function makeGatewayRequest(
 ): Promise<Request> {
     const newHeaders = new Headers(headers)
     setAuthHeader(newHeaders, restResource, key)
+    if ((env as any).AI_GATEWAY_TOKEN) {
+        newHeaders.set('cf-aig-authorization', `Bearer ${(env as any).AI_GATEWAY_TOKEN}`)
+    }
 
     const selected = selectGateway(env)
     let base = await env.AI.gateway(selected).getUrl()
