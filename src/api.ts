@@ -80,7 +80,12 @@ async function extractModelFromBody(request: Request): Promise<string | null> {
 }
 
 function extractModelFromPath(restResource: string): string | null {
-    const parts = restResource.split('/models/')
+    const pathWithoutQuery = restResource.split('?')[0]
+    if (pathWithoutQuery.endsWith('/models')) {
+        return 'list-models'
+    }
+
+    const parts = pathWithoutQuery.split('/models/')
     if (parts.length > 1) {
         return parts[1].split(':')[0]
     }
@@ -102,7 +107,7 @@ async function forward(
     }
 
     const body = request.body ? await request.arrayBuffer() : null
-    const MAX_RETRIES = 30
+    const MAX_RETRIES = 6
     for (let i = 0; i < MAX_RETRIES; i++) {
         if (activeKeys.length === 0) {
             return new Response('No active keys available', { status: 503 })
